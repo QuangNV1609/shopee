@@ -38,10 +38,13 @@ public class CartProductApi {
 	}
 
 	@DeleteMapping(value = "/delete")
-	public void deleteProduct(@RequestBody CartProductDto cartProductDto) {
-		CartProductId cartProductId = new CartProductId(cartProductDto.getCartId(), cartProductDto.getProductId(),
-				cartProductDto.getColorname());
+	public void deleteProduct(@RequestBody CartProductId cartProductId) {
 		cartProductService.deleteProduct(cartProductId);
+	}
+	
+	@DeleteMapping(value = "/delete/list")
+	public void deleteListProduct(@RequestBody List<CartProductId> cartProductIds) {
+		cartProductService.deleteListProduct(cartProductIds);
 	}
 
 }

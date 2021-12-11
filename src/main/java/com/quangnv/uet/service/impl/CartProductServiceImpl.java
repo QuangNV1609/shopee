@@ -79,4 +79,11 @@ public class CartProductServiceImpl implements CartProductService {
 		cartProductRepository.deleteById(cartProductId);
 	}
 
+	@Override
+	public void deleteListProduct(List<CartProductId> cartProductIds) {
+		for (CartProductId cartProductId : cartProductIds) {
+			cartProductRepository.deleteById(cartProductId);
+		}
+	}
+
 }

@@ -12,4 +12,6 @@ public interface CartProductService {
 	public List<CartProductDto> getCartByCartId(String cardId);
 	
 	public void deleteProduct(CartProductId cartProductId);
+	
+	public void deleteListProduct(List<CartProductId> cartProductIds);
 }
