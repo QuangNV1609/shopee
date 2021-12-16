@@ -14,5 +14,6 @@ public class CustomerDto {
 	private String username;
 	private String email;
 	private String cartId;
+	private String role;
 
 }

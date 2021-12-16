@@ -1,4 +1,4 @@
-package com.quangnv.uet.filters;
+package com.quangnv.uet.jwt;
 
 import java.io.IOException;
 
@@ -15,7 +15,6 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.quangnv.uet.jwt.JwtTokenProvider;
 import com.quangnv.uet.service.impl.UserServiceImpl;
 
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +44,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 					SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 				}
+			} else {
+				SecurityContextHolder.getContext().setAuthentication(null);
 			}
 		} catch (Exception e) {
 			log.error("failed on set user authentication", e);

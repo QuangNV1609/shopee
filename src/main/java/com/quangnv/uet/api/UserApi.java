@@ -78,7 +78,7 @@ public class UserApi {
 		return new ResponseEntity<UserDto>(dto, HttpStatus.CREATED);
 	}
 
-	@PostMapping(value = "/login1")
+	@PostMapping(value = "/login")
 	public ResponseEntity<UserDto> login(@RequestBody UserDto userDto) {
 		Authentication authentication = authenticationManager
 				.authenticate(new UsernamePasswordAuthenticationToken(userDto.getUsername(), userDto.getPassword()));

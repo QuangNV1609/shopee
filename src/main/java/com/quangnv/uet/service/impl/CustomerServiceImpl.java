@@ -23,6 +23,7 @@ public class CustomerServiceImpl implements CustomerService{
 		CustomerDto customerDto = modelMapper.map(customerEntity, CustomerDto.class);
 		customerDto.setCartId(customerEntity.getCartEntity().getCartId());
 		customerDto.setUsername(customerEntity.getUserEntity().getUsername());
+		customerDto.setRole(customerEntity.getUserEntity().getRoleEntities().toString());
 		return customerDto;
 	}
 

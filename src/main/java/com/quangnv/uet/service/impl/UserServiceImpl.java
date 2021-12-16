@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -17,9 +18,11 @@ import org.springframework.stereotype.Service;
 import com.quangnv.uet.dto.UserDto;
 import com.quangnv.uet.entities.CartEntity;
 import com.quangnv.uet.entities.CustomerEntity;
+import com.quangnv.uet.entities.RoleEntity;
 import com.quangnv.uet.entities.UserEntity;
 import com.quangnv.uet.repository.CartRepository;
 import com.quangnv.uet.repository.CustomerRepository;
+import com.quangnv.uet.repository.RoleRepository;
 import com.quangnv.uet.repository.UserRepository;
 import com.quangnv.uet.service.UserService;
 
@@ -41,6 +44,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
+	@Autowired
+	private RoleRepository roleRepository;
+
 	@Override
 	public UserDto saveUser(UserDto userDto) {
 		CustomerEntity customerEntity = new CustomerEntity();
@@ -53,6 +59,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 		UserEntity userEntity = modelMapper.map(userDto, UserEntity.class);
 		userEntity.setCustomerEntity(customerEntity);
 		userEntity.setPassword(passwordEncoder.encode(userDto.getPassword()));
+
+//		List<RoleEntity> userRole = new ArrayList<RoleEntity>();
+//		userRole.add(roleRepository.save(RoleEntity.builder().rolename("ROLE_USER").build()));
+//
+//		userEntity.setRoleEntities(userRole);
+//		
+//		System.out.println(userEntity);
 		userEntity = userRepository.save(userEntity);
 		userEntity.setPassword(null);
 

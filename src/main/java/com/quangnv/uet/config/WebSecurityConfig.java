@@ -13,7 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.quangnv.uet.filters.JwtAuthenticationFilter;
+import com.quangnv.uet.jwt.JwtAuthenticationFilter;
 import com.quangnv.uet.service.impl.UserServiceImpl;
 
 @Configuration
