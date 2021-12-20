@@ -88,7 +88,7 @@ public class UserApi {
 		userDto.setPassword(null);
 
 		String jwt = jwtTokenProvider.generateToken(userDto);
-		
+
 		userDto.setJwt(jwt);
 		return new ResponseEntity<UserDto>(userDto, HttpStatus.OK);
 	}

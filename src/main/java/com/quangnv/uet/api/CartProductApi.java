@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,11 +38,17 @@ public class CartProductApi {
 		return new ResponseEntity<CartProductDto>(cartProductDto, HttpStatus.CREATED);
 	}
 
+	@PutMapping(value = "/edit")
+	public ResponseEntity<CartProductDto> editProduct(@RequestBody CartProductDto cartProductDto) {
+		cartProductDto = cartProductService.editProduct(cartProductDto);
+		return new ResponseEntity<CartProductDto>(cartProductDto, HttpStatus.OK);
+	}
+
 	@DeleteMapping(value = "/delete")
 	public void deleteProduct(@RequestBody CartProductId cartProductId) {
 		cartProductService.deleteProduct(cartProductId);
 	}
-	
+
 	@DeleteMapping(value = "/delete/list")
 	public void deleteListProduct(@RequestBody List<CartProductId> cartProductIds) {
 		cartProductService.deleteListProduct(cartProductIds);

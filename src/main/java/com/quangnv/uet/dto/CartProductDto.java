@@ -17,4 +17,5 @@ public class CartProductDto {
 	private Double price;
 	private Integer quantity;
 	private String image;
+	private int totalQuantity;
 }

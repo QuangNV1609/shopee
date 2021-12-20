@@ -2,18 +2,24 @@ package com.quangnv.uet.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.quangnv.uet.dto.CartProductDto;
 import com.quangnv.uet.entities.CartEntity;
 import com.quangnv.uet.entities.CartProductEntity;
+import com.quangnv.uet.entities.ProductColorEntity;
 import com.quangnv.uet.entities.ProductEntity;
 import com.quangnv.uet.entities.ids.CartProductId;
+import com.quangnv.uet.entities.ids.ProductColorId;
+import com.quangnv.uet.exception.ResoureNotFoundException;
 import com.quangnv.uet.repository.CartProductRepository;
 import com.quangnv.uet.repository.CartRepository;
+import com.quangnv.uet.repository.ColorRepository;
 import com.quangnv.uet.repository.ProductRepository;
 import com.quangnv.uet.service.CartProductService;
 
@@ -29,28 +35,60 @@ public class CartProductServiceImpl implements CartProductService {
 	private CartProductRepository cartProductRepository;
 
 	@Autowired
+	private ColorRepository colorRepository;
+
+	@Autowired
 	private ModelMapper modelMapper;
 
 	@Override
+	@Transactional
 	public CartProductDto addProductToCart(CartProductDto cartProductDto) {
+		ProductColorId productColorId = new ProductColorId(cartProductDto.getColorname(),
+				cartProductDto.getProductId());
+
+		Optional<ProductColorEntity> optionalProductColor = colorRepository.findById(productColorId);
+		if (!optionalProductColor.isPresent()) {
+			throw new ResoureNotFoundException(cartProductDto.getProductId() + " not found!");
+		}
+
+		ProductColorEntity productColorEntity = optionalProductColor.get();
 		CartEntity cartEntity = cartRepository.findById(cartProductDto.getCartId()).get();
 		ProductEntity productEntity = productRepository.findById(cartProductDto.getProductId()).get();
 
-		CartProductEntity cartProductEntity = modelMapper.map(cartProductDto, CartProductEntity.class);
-		CartProductId cartProductId = new CartProductId(cartEntity.getCartId(), productEntity.getProductId(),
+		CartProductId cartProductId = new CartProductId(cartProductDto.getCartId(), cartProductDto.getProductId(),
 				cartProductDto.getColorname());
+
+		CartProductEntity cartProductEntity = modelMapper.map(cartProductDto, CartProductEntity.class);
+
+		Optional<CartProductEntity> optionalCartProduct = cartProductRepository.findById(cartProductId);
+
+		if (optionalCartProduct.isPresent()) {
+			cartProductEntity = optionalCartProduct.get();
+			int totalQuantity = cartProductDto.getQuantity() + cartProductEntity.getQuantity();
+			if (productColorEntity.getQuantity() >= totalQuantity) {
+				cartProductEntity.setQuantity(cartProductDto.getQuantity() + cartProductEntity.getQuantity());
+			} else {
+				cartProductEntity.setQuantity(productColorEntity.getQuantity());
+			}
+		} else {
+			if (productColorEntity.getQuantity() >= cartProductDto.getQuantity()) {
+				cartProductEntity.setQuantity(cartProductDto.getQuantity());
+			} else {
+				cartProductEntity.setQuantity(productColorEntity.getQuantity());
+			}
+		}
 
 		cartProductEntity.setCartProductId(cartProductId);
 		cartProductEntity.setCartEntity(cartEntity);
 		cartProductEntity.setProductEntity(productEntity);
-
+		System.out.println(cartProductEntity.getQuantity());
 		cartProductRepository.save(cartProductEntity);
 
 		String image = "http://localhost:8080/image/" + productEntity.getImageEntities().get(0).getImageId();
 
 		cartProductDto.setImage(image);
 		cartProductDto.setProductName(productEntity.getProductName());
-
+		cartProductDto.setTotalQuantity(productColorEntity.getQuantity());
 		return cartProductDto;
 	}
 
@@ -68,7 +106,7 @@ public class CartProductServiceImpl implements CartProductService {
 			cartProductDto.setProductId(cartProductEntity.getProductEntity().getProductId());
 			cartProductDto.setCartId(cartProductEntity.getCartEntity().getCartId());
 			cartProductDto.setColorname(cartProductEntity.getCartProductId().getColorname());
-
+			cartProductDto.setTotalQuantity(colorRepository.getQuantityByColorname(cartProductDto.getColorname()));
 			cartProductDtos.add(cartProductDto);
 		}
 		return cartProductDtos;
@@ -84,6 +122,39 @@ public class CartProductServiceImpl implements CartProductService {
 		for (CartProductId cartProductId : cartProductIds) {
 			cartProductRepository.deleteById(cartProductId);
 		}
+	}
+
+	@Override
+	public CartProductDto editProduct(CartProductDto cartProductDto) {
+		ProductColorId productColorId = new ProductColorId(cartProductDto.getColorname(),
+				cartProductDto.getProductId());
+
+		Optional<ProductColorEntity> optionalProductColor = colorRepository.findById(productColorId);
+		if (!optionalProductColor.isPresent()) {
+			throw new ResoureNotFoundException(cartProductDto.getProductId() + " not found!");
+		}
+
+		ProductColorEntity productColorEntity = optionalProductColor.get();
+		CartEntity cartEntity = cartRepository.findById(cartProductDto.getCartId()).get();
+		ProductEntity productEntity = productRepository.findById(cartProductDto.getProductId()).get();
+
+		CartProductId cartProductId = new CartProductId(cartProductDto.getCartId(), cartProductDto.getProductId(),
+				cartProductDto.getColorname());
+
+		CartProductEntity cartProductEntity = modelMapper.map(cartProductDto, CartProductEntity.class);
+
+		cartProductEntity.setCartProductId(cartProductId);
+		cartProductEntity.setCartEntity(cartEntity);
+		cartProductEntity.setProductEntity(productEntity);
+
+		cartProductRepository.save(cartProductEntity);
+
+		String image = "http://localhost:8080/image/" + productEntity.getImageEntities().get(0).getImageId();
+
+		cartProductDto.setImage(image);
+		cartProductDto.setProductName(productEntity.getProductName());
+		cartProductDto.setTotalQuantity(productColorEntity.getQuantity());
+		return cartProductDto;
 	}
 
 }

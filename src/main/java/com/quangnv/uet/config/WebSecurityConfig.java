@@ -9,10 +9,12 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.quangnv.uet.jwt.JwtAuthenticationEntryPoint;
 import com.quangnv.uet.jwt.JwtAuthenticationFilter;
 import com.quangnv.uet.service.impl.UserServiceImpl;
 
@@ -21,6 +23,9 @@ import com.quangnv.uet.service.impl.UserServiceImpl;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private UserServiceImpl userServiceImpl;
+
+	@Autowired
+	private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {
@@ -38,13 +43,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		// TODO Auto-generated method stub
 		return super.authenticationManager();
 	}
-	
-	
-	
+
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.csrf().disable();
 
+		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+		http.exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint);
 		http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 	}
 

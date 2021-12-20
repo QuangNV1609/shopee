@@ -11,6 +11,8 @@ public interface CartProductService {
 	
 	public List<CartProductDto> getCartByCartId(String cardId);
 	
+	public CartProductDto editProduct(CartProductDto cartProductDto);
+	
 	public void deleteProduct(CartProductId cartProductId);
 	
 	public void deleteListProduct(List<CartProductId> cartProductIds);
